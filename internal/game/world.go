@@ -11,8 +11,6 @@ type World struct {
 	hub     *network.Hub
 }
 
-
-
 func CreateWorld(hub *network.Hub) *World {
 	return &World{
 		players: make(map[uuid.UUID]*player.Player),

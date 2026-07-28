@@ -3,7 +3,6 @@ package network
 import (
 	"encoding/json"
 
-	"github.com/1tzArad/wyrm/internal/game"
 	"github.com/google/uuid"
 )
 
@@ -24,7 +23,7 @@ func (c *Context) Reply(msgType string, payload interface{}) error {
 		return err
 	}
 
-	msg := game.Message{
+	msg := Message{
 		Type:    msgType,
 		Payload: data,
 	}

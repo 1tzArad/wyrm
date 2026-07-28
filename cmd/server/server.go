@@ -2,14 +2,27 @@ package main
 
 import (
 	"flag"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/1tzArad/wyrm/internal/game"
 	"github.com/1tzArad/wyrm/internal/network"
+	"github.com/1tzArad/wyrm/pkg/response"
 	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 )
+
+
+var wsUpgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 func init() {
 	var isDebuggingMode bool
@@ -43,7 +56,27 @@ func main() {
 	r.Use(gin.Recovery())
 	r.Use(gin.Logger())
 
-	r.GET("/ws", network.Handler(hub, world))
+	r.GET("/ws", WSHandler(hub, world))
 
 	r.Run(":8080")
+}
+
+
+func WSHandler(hub *network.Hub, world *game.World) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		conn, err := wsUpgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			log.Error("Failed to upgrade connection!", "err", err.Error())
+			response.InternalFail(c)
+			return
+		}
+
+		playerUUID := uuid.New()
+		world.CreatePlayer(playerUUID)
+
+		client := network.NewClient(conn, hub, playerUUID)
+
+		go client.ReadPump()
+		go client.WritePump()
+	}
 }

@@ -3,7 +3,6 @@ package network
 import (
 	"encoding/json"
 
-	"github.com/1tzArad/wyrm/internal/game"
 	"github.com/charmbracelet/log"
 )
 
@@ -22,7 +21,7 @@ func (r *Registery) Register(msgType string, handler HandlerFunc) {
 }
 
 func (r *Registery) Dispatch(client *WSClient, raw []byte) {
-	var msg game.Message
+	var msg Message
 	if err := json.Unmarshal(raw, &msg); err != nil {
 		log.Errorf("Invalid message from %s: %v", client.UUID, err)
 		return
