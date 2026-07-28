@@ -21,15 +21,17 @@ type WSClient struct {
 	Conn       *websocket.Conn
 	Send       chan []byte
 	PlayerUUID uuid.UUID
+	Registery  *Registery
 }
 
-func NewClient(conn *websocket.Conn, hub *Hub, playerUUID uuid.UUID) *WSClient {
+func NewClient(conn *websocket.Conn, hub *Hub, playerUUID uuid.UUID, registery *Registery) *WSClient {
 	return &WSClient{
 		UUID:       uuid.New(),
 		Hub:        hub,
 		Conn:       conn,
 		Send:       make(chan []byte),
 		PlayerUUID: playerUUID,
+		Registery:  registery,
 	}
 }
 
@@ -55,11 +57,8 @@ func (client *WSClient) ReadPump() {
 			}
 			break
 		}
-
-		// handle the message here!
-		// example echo the recived message!
-		log.Debugf("Recived: %s", string(message))
-		client.Send <- message
+		log.Debugf("Received: %s", string(message))
+		client.Registery.Dispatch(client, message)
 	}
 }
 
