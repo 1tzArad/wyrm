@@ -8,17 +8,23 @@ import (
 	"github.com/google/uuid"
 )
 
+type Broadcaster interface {
+	Broadcast(message []byte)
+}
+
 type World struct {
 	mu sync.RWMutex
 
-	players map[uuid.UUID]*player.Player
-	hub     *network.Hub
+	players     map[uuid.UUID]*player.Player
+	Hub         *network.Hub
+	Broadcaster Broadcaster
 }
 
 func CreateWorld(hub *network.Hub) *World {
 	return &World{
-		players: make(map[uuid.UUID]*player.Player),
-		hub:     hub,
+		players:     make(map[uuid.UUID]*player.Player),
+		Hub:         hub,
+		Broadcaster: hub,
 	}
 }
 
