@@ -1,5 +1,7 @@
 package game
 
+import "github.com/google/uuid"
+
 type Direction string
 
 const (
@@ -33,4 +35,11 @@ func (t ChatTypes) IsValid() bool {
 	default:
 		return false
 	}
+}
+
+type PlayerState struct {
+	UUID   uuid.UUID
+	X      float64 `json:"x"`
+	Y      float64 `json:"y"`
+	Health int     `json:"health"`
 }
