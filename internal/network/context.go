@@ -8,6 +8,7 @@ import (
 
 type Context struct {
 	ClientUUID uuid.UUID
+	PlayerUUID uuid.UUID
 	Payload    json.RawMessage
 	hub        *Hub
 	client     *WSClient
