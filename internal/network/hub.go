@@ -28,22 +28,22 @@ func (hub *Hub) Run() {
 	for {
 		select {
 		case client := <-hub.register:
-			hub.registerClient(client)
+			hub.registerClientHandler(client)
 		case client := <-hub.unregister:
-			hub.unregisterClient(client)
+			hub.unregisterClientHandler(client)
 		case message := <-hub.broadcast:
-			hub.sendBroadcast(message)
+			hub.handleBroadcasts(message)
 		}
 	}
 }
 
-func (hub *Hub) registerClient(client *WSClient) {
+func (hub *Hub) registerClientHandler(client *WSClient) {
 	hub.mu.Lock()
 	defer hub.mu.Unlock()
 	hub.clients[client.UUID] = client
 }
 
-func (hub *Hub) unregisterClient(client *WSClient) {
+func (hub *Hub) unregisterClientHandler(client *WSClient) {
 	hub.mu.Lock()
 	defer hub.mu.Unlock()
 	if _, ok := hub.clients[client.UUID]; ok {
@@ -52,7 +52,7 @@ func (hub *Hub) unregisterClient(client *WSClient) {
 	}
 }
 
-func (hub *Hub) sendBroadcast(message []byte) {
+func (hub *Hub) handleBroadcasts(message []byte) {
 	for clientUUID, client := range hub.clients {
 		select {
 		case client.Send <- message:
@@ -61,4 +61,12 @@ func (hub *Hub) sendBroadcast(message []byte) {
 			delete(hub.clients, clientUUID)
 		}
 	}
+}
+
+func (hub *Hub) Broadcast(message []byte) {
+	hub.broadcast <- message
+}
+
+func (hub *Hub) Register(client *WSClient) {
+	hub.register <- client
 }
