@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/1tzArad/wyrm/internal/game"
+	"github.com/1tzArad/wyrm/internal/game/handlers"
 	"github.com/1tzArad/wyrm/internal/network"
 	"github.com/1tzArad/wyrm/pkg/response"
 	"github.com/charmbracelet/log"
@@ -14,7 +15,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
-
 
 var wsUpgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -50,19 +50,22 @@ func main() {
 	hub := network.NewHub()
 	go hub.Run()
 
+	registery := network.NewRegistery()
+
 	world := game.CreateWorld(hub)
+
+	handlers.RegisterHandlers(registery, world)
 
 	// registering middlewares
 	r.Use(gin.Recovery())
 	r.Use(gin.Logger())
 
-	r.GET("/ws", WSHandler(hub, world))
+	r.GET("/ws", WSHandler(hub, world, registery))
 
 	r.Run(":8080")
 }
 
-
-func WSHandler(hub *network.Hub, world *game.World) gin.HandlerFunc {
+func WSHandler(hub *network.Hub, world *game.World, registery *network.Registery) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		conn, err := wsUpgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -74,7 +77,9 @@ func WSHandler(hub *network.Hub, world *game.World) gin.HandlerFunc {
 		playerUUID := uuid.New()
 		world.CreatePlayer(playerUUID)
 
-		client := network.NewClient(conn, hub, playerUUID)
+		client := network.NewClient(conn, hub, playerUUID, registery)
+
+		hub.Register(client)
 
 		go client.ReadPump()
 		go client.WritePump()
