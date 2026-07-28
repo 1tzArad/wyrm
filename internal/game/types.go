@@ -9,6 +9,15 @@ const (
 	RIGHT Direction = "right"
 )
 
+func (d Direction) IsValid() bool {
+	switch d {
+	case UP, DOWN, LEFT, RIGHT:
+		return true
+	default:
+		return false
+	}
+}
+
 type ChatTypes string
 
 const (
@@ -16,3 +25,12 @@ const (
 	WHISPER ChatTypes = "whisper"
 	PRIVATE ChatTypes = "private"
 )
+
+func (t ChatTypes) IsValid() bool {
+	switch t {
+	case GLOBAL, WHISPER, PRIVATE:
+		return true
+	default:
+		return false
+	}
+}
