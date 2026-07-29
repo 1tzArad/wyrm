@@ -5,6 +5,7 @@ import (
 
 	"github.com/1tzArad/wyrm/internal/network"
 	"github.com/1tzArad/wyrm/internal/player"
+	"github.com/charmbracelet/log"
 	"github.com/google/uuid"
 )
 
@@ -74,6 +75,8 @@ func (w *World) MovePlayer(uuid uuid.UUID, direction Direction) {
 	case RIGHT:
 		p.X++
 	}
+	log.Debugf("New player move to %s", direction)
+	log.Debugf("new x: %f | new y: %f", p.X, p.Y)
 }
 
 func (w *World) Snapshot() []PlayerState {
