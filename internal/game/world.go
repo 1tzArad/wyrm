@@ -10,20 +10,21 @@ import (
 
 type Broadcaster interface {
 	Broadcast(message []byte)
+	SendToPlayer(playerUUID uuid.UUID, message []byte) error
 }
 
 type World struct {
 	mu sync.RWMutex
 
 	players     map[uuid.UUID]*player.Player
-	Hub         *network.Hub
+	hub         *network.Hub
 	Broadcaster Broadcaster
 }
 
 func CreateWorld(hub *network.Hub) *World {
 	return &World{
 		players:     make(map[uuid.UUID]*player.Player),
-		Hub:         hub,
+		hub:         hub,
 		Broadcaster: hub,
 	}
 }
