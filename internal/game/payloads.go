@@ -10,7 +10,7 @@ type ChatPayload struct {
 	Text   string    `json:"text"`
 }
 
-type ChatBroadcastMessage struct{
-	PlayerUUID string 	`json:"player_uuid"`
-	Text string `json:"text"`
+type ChatReceivePayload struct {
+	PlayerUUID string `json:"player_uuid"`
+	Text       string `json:"text"`
 }
