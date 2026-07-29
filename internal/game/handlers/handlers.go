@@ -7,4 +7,5 @@ import (
 
 func RegisterHandlers(registry *network.Registery, world *game.World) {
 	registry.Register("chat", chatHandler(world))
+	registry.Register("move", moveHandler(world))
 }
