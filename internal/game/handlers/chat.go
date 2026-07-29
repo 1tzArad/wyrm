@@ -14,7 +14,7 @@ func chatHandler(world *game.World) network.HandlerFunc {
 		log.Debug("received new chat")
 		var data game.ChatPayload
 		if err := c.Bind(&data); err != nil {
-			// server response
+			c.ReplyError("invalid_body", "invalid body!")
 			return
 		}
 
@@ -25,7 +25,7 @@ func chatHandler(world *game.World) network.HandlerFunc {
 		case game.PRIVATE:
 			handlePrivateChat(&data, c, world)
 		default:
-			// server response
+			c.ReplyError("invalid_chat", "invalid chat type!")
 			log.Error("invalid chat type!", "type", chatType)
 		}
 	}
@@ -52,13 +52,13 @@ func handleGlobalChat(data *game.ChatPayload, c *network.Context, world *game.Wo
 func handlePrivateChat(data *game.ChatPayload, c *network.Context, world *game.World) {
 	targetStr := data.Target
 	if targetStr == "" {
-		// server response
+		c.ReplyError("invalid_target", "target cannot be empty")
 		log.Error("no target")
 		return
 	}
 	target, err := uuid.Parse(targetStr)
 	if err != nil {
-		// server response
+		c.ReplyError("invalid_target", "target must be uuid!")
 		log.Error("invalid target")
 		return
 	}

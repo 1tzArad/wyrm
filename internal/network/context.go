@@ -7,6 +7,7 @@ import (
 )
 
 type Context struct {
+	RequestID  string
 	ClientUUID uuid.UUID
 	PlayerUUID uuid.UUID
 	Payload    json.RawMessage
@@ -25,8 +26,9 @@ func (c *Context) Reply(msgType string, payload interface{}) error {
 	}
 
 	msg := Message{
-		Type:    msgType,
-		Payload: data,
+		Type:      msgType,
+		RequestID: c.RequestID,
+		Payload:   data,
 	}
 
 	raw, err := json.Marshal(msg)
@@ -34,7 +36,33 @@ func (c *Context) Reply(msgType string, payload interface{}) error {
 		return err
 	}
 
-	c.client.Send <- raw
+	c.client.Send(raw)
+
+	return nil
+}
+
+func (c *Context) ReplyError(code, message string) error {
+	payload := ServerErrorPayload{
+		Code:    code,
+		Message: message,
+	}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	msg := Message{
+		Type:      "error",
+		RequestID: c.RequestID,
+		Payload:   data,
+	}
+
+	raw, err := json.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	c.client.Send(raw)
 
 	return nil
 }

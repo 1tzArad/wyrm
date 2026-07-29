@@ -58,14 +58,14 @@ func (hub *Hub) unregisterClientHandler(client *WSClient) {
 	if _, ok := hub.clients[client.UUID]; ok {
 		delete(hub.clients, client.UUID)
 		delete(hub.playerToClient, client.PlayerUUID)
-		close(client.Send)
+		close(client.send)
 	}
 }
 
 func (hub *Hub) handleBroadcasts(message []byte) {
 	for _, client := range hub.clients {
 		select {
-		case client.Send <- message:
+		case client.send <- message:
 		default:
 			hub.unregisterClientHandler(client)
 		}
@@ -95,7 +95,7 @@ func (hub *Hub) SendToPlayer(playerUUID uuid.UUID, message []byte) error {
 	}
 
 	select {
-	case client.Send <- message:
+	case client.send <- message:
 		return nil
 	default:
 		return fmt.Errorf("failed to send to player %s: channel full", playerUUID)

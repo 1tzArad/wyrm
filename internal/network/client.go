@@ -19,7 +19,7 @@ type WSClient struct {
 	UUID       uuid.UUID
 	Hub        *Hub
 	Conn       *websocket.Conn
-	Send       chan []byte
+	send       chan []byte
 	PlayerUUID uuid.UUID
 	Registery  *Registery
 }
@@ -29,7 +29,7 @@ func NewClient(conn *websocket.Conn, hub *Hub, playerUUID uuid.UUID, registery *
 		UUID:       uuid.New(),
 		Hub:        hub,
 		Conn:       conn,
-		Send:       make(chan []byte),
+		send:       make(chan []byte),
 		PlayerUUID: playerUUID,
 		Registery:  registery,
 	}
@@ -72,7 +72,7 @@ func (client *WSClient) WritePump() {
 
 	for {
 		select {
-		case msg, ok := <-client.Send:
+		case msg, ok := <-client.send:
 			client.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				client.Conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -88,4 +88,7 @@ func (client *WSClient) WritePump() {
 			}
 		}
 	}
+}
+func (client *WSClient) Send(message []byte) {
+	client.send <- message
 }

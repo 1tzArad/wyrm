@@ -35,6 +35,7 @@ func (r *Registery) Dispatch(client *WSClient, raw []byte) {
 	}
 
 	ctx := &Context{
+		RequestID:  msg.RequestID,
 		ClientUUID: client.UUID,
 		PlayerUUID: client.PlayerUUID,
 		Payload:    msg.Payload,
