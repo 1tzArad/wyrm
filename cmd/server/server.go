@@ -56,6 +56,8 @@ func main() {
 
 	handlers.RegisterHandlers(registery, world)
 
+	go world.RunLoop()
+
 	// registering middlewares
 	r.Use(gin.Recovery())
 	r.Use(gin.Logger())
