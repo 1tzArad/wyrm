@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func ChatHandler(world *game.World) network.HandlerFunc {
+func chatHandler(world *game.World) network.HandlerFunc {
 	return func(c *network.Context) {
 		log.Debug("received new chat")
 		var data game.ChatPayload

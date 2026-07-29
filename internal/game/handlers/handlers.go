@@ -6,5 +6,5 @@ import (
 )
 
 func RegisterHandlers(registry *network.Registery, world *game.World) {
-	registry.Register("chat", ChatHandler(world))
+	registry.Register("chat", chatHandler(world))
 }
