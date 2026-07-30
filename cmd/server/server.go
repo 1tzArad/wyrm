@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/1tzArad/wyrm/internal/game"
@@ -47,6 +50,7 @@ func init() {
 }
 
 func main() {
+
 	dbcfg := storage.CreateConfig("postgres", "")
 	db, err := storage.Open(*dbcfg)
 	if err != nil {
@@ -67,15 +71,28 @@ func main() {
 
 	handlers.RegisterHandlers(registery, world)
 
-	go world.RunLoop()
+	ctx := context.Background()
 
+	go world.RunLoop()
+	go world.RunAutoSave(ctx)
 	// registering middlewares
 	r.Use(gin.Recovery())
 	r.Use(gin.Logger())
 
 	r.GET("/ws", WSHandler(hub, world, registery))
 
+	// graceful shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		log.Warn("shutting down, saving all players...")
+		world.SaveAllPlayers(context.Background())
+		os.Exit(0)
+	}()
+
 	r.Run(":8080")
+
 }
 
 func WSHandler(hub *network.Hub, world *game.World, registery *network.Registery) gin.HandlerFunc {
