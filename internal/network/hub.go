@@ -91,13 +91,13 @@ func (hub *Hub) GetPlayer(uuid uuid.UUID) *WSClient {
 func (hub *Hub) SendToPlayer(playerUUID uuid.UUID, message []byte) error {
 	client, ok := hub.playerToClient[playerUUID]
 	if !ok {
-		return fmt.Errorf("player %s not connected", playerUUID)
+		return fmt.Errorf("%w: player=%s", ErrPlayerNotConnected, playerUUID.String())
 	}
 
 	select {
 	case client.send <- message:
 		return nil
 	default:
-		return fmt.Errorf("failed to send to player %s: channel full", playerUUID)
+		return fmt.Errorf("%w: player=%s", ErrPlayerChannelFull, playerUUID.String())
 	}
 }
