@@ -34,9 +34,9 @@ func (w *World) CreatePlayer(uuid uuid.UUID) *player.Player {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	p := &player.Player{
-		UUID: uuid,
-		X:    0,
-		Y:    0,
+		ID: uuid,
+		X:  0,
+		Y:  0,
 	}
 
 	w.players[uuid] = p
