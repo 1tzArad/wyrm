@@ -9,6 +9,8 @@ import (
 	"github.com/1tzArad/wyrm/internal/game"
 	"github.com/1tzArad/wyrm/internal/game/handlers"
 	"github.com/1tzArad/wyrm/internal/network"
+	"github.com/1tzArad/wyrm/internal/storage"
+	postgres_repository "github.com/1tzArad/wyrm/internal/storage/postgres/repository"
 	"github.com/1tzArad/wyrm/pkg/response"
 	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
@@ -45,6 +47,13 @@ func init() {
 }
 
 func main() {
+	dbcfg := storage.CreateConfig("postgres", "")
+	db, err := storage.Open(*dbcfg)
+	if err != nil {
+		log.Fatal("Failed to open database connection!", "err", err.Error())
+		return
+	}
+
 	r := gin.New()
 
 	hub := network.NewHub()
@@ -52,7 +61,9 @@ func main() {
 
 	registery := network.NewRegistery()
 
-	world := game.CreateWorld(hub)
+	playerRepo := postgres_repository.NewPlayerRepository(db)
+
+	world := game.CreateWorld(hub, playerRepo)
 
 	handlers.RegisterHandlers(registery, world)
 

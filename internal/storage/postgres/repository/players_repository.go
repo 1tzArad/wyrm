@@ -1,7 +1,8 @@
-package repository
+package postgres_repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/1tzArad/wyrm/internal/player"
 	sqlc "github.com/1tzArad/wyrm/internal/storage/postgres/generated"
@@ -12,6 +13,11 @@ type PlayerRepository struct {
 	queries *sqlc.Queries
 }
 
+func NewPlayerRepository(db *sql.DB) *PlayerRepository {
+	return &PlayerRepository{
+		queries: sqlc.New(db),
+	}
+}
 func (r *PlayerRepository) LoadPlayer(ctx context.Context, id uuid.UUID) (*player.Player, error) {
 	row, err := r.queries.GetPlayer(ctx, id)
 	if err != nil {

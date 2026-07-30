@@ -20,13 +20,15 @@ type World struct {
 	players     map[uuid.UUID]*player.Player
 	hub         *network.Hub
 	Broadcaster Broadcaster
+	store       PlayerStore
 }
 
-func CreateWorld(hub *network.Hub) *World {
+func CreateWorld(hub *network.Hub, store PlayerStore) *World {
 	return &World{
 		players:     make(map[uuid.UUID]*player.Player),
 		hub:         hub,
 		Broadcaster: hub,
+		store:       store,
 	}
 }
 
