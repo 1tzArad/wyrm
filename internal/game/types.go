@@ -39,7 +39,7 @@ func (t ChatTypes) IsValid() bool {
 
 type PlayerState struct {
 	UUID   uuid.UUID
-	X      float64 `json:"x"`
-	Y      float64 `json:"y"`
-	Health int     `json:"health"`
+	X      int32 `json:"x"`
+	Y      int32 `json:"y"`
+	Health int32 `json:"health"`
 }

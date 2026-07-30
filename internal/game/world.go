@@ -86,7 +86,7 @@ func (w *World) Snapshot() []PlayerState {
 	states := make([]PlayerState, 0, len(w.players))
 	for _, p := range w.players {
 		states = append(states, PlayerState{
-			UUID:   p.UUID,
+			UUID:   p.ID,
 			X:      p.X,
 			Y:      p.Y,
 			Health: p.Health,
