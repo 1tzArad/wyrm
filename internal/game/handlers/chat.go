@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/1tzArad/wyrm/internal/game"
 	"github.com/1tzArad/wyrm/internal/network"
@@ -77,5 +78,16 @@ func handlePrivateChat(data *game.ChatPayload, c *network.Context, world *game.W
 
 	finalBytes, _ := json.Marshal(outMsg)
 
-	world.Broadcaster.SendToPlayer(target, finalBytes)
+	if err := world.Broadcaster.SendToPlayer(target, finalBytes); err != nil {
+		if errors.Is(err, network.ErrPlayerNotConnected) {
+			c.ReplyError("player_offline", "target player is offline!")
+			return
+		}
+		if errors.Is(err, network.ErrPlayerChannelFull) {
+			c.ReplyError("target_channel_full", "target player's channel is full!")
+			return
+		}
+		c.ReplyError("internal_error", err.Error())
+		return
+	}
 }
