@@ -75,6 +75,18 @@ func main() {
 
 	go world.RunLoop()
 	go world.RunAutoSave(ctx)
+
+	hub.OnPlayerDisconnect = func(playerid uuid.UUID) {
+		p, ok := world.GetPlayer(playerid)
+		if !ok {
+			return
+		}
+		if err := playerRepo.SavePlayer(context.Background(), p); err != nil {
+			log.Errorf("failed to save player %s on disconnect: %v", playerid, err)
+		}
+		world.RemovePlayer(playerid)
+	}
+
 	// registering middlewares
 	r.Use(gin.Recovery())
 	r.Use(gin.Logger())

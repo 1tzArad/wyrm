@@ -15,6 +15,8 @@ type Hub struct {
 	unregister     chan *WSClient
 	broadcast      chan []byte
 
+	OnPlayerDisconnect func(playerid uuid.UUID)
+
 	mu sync.RWMutex
 }
 
@@ -59,6 +61,9 @@ func (hub *Hub) unregisterClientHandler(client *WSClient) {
 		delete(hub.clients, client.UUID)
 		delete(hub.playerToClient, client.PlayerUUID)
 		close(client.send)
+		if hub.OnPlayerDisconnect != nil {
+			hub.OnPlayerDisconnect(client.PlayerUUID)
+		}
 	}
 }
 
