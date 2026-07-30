@@ -76,7 +76,7 @@ func (w *World) MovePlayer(uuid uuid.UUID, direction Direction) {
 		p.X++
 	}
 	log.Debugf("New player move to %s", direction)
-	log.Debugf("new x: %f | new y: %f", p.X, p.Y)
+	log.Debugf("new x: %d | new y: %d", p.X, p.Y)
 }
 
 func (w *World) Snapshot() []PlayerState {
