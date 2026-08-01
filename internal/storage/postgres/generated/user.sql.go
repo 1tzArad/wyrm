@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -27,9 +26,9 @@ RETURNING id, username, password_hash, created_at
 `
 
 type CreateUserParams struct {
-	ID           uuid.UUID      `json:"id"`
-	Username     string         `json:"username"`
-	PasswordHash sql.NullString `json:"password_hash"`
+	ID           uuid.UUID `json:"id"`
+	Username     string    `json:"username"`
+	PasswordHash string    `json:"password_hash"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -117,9 +116,9 @@ WHERE id = $1
 `
 
 type UpdateUserParams struct {
-	ID           uuid.UUID      `json:"id"`
-	Username     string         `json:"username"`
-	PasswordHash sql.NullString `json:"password_hash"`
+	ID           uuid.UUID `json:"id"`
+	Username     string    `json:"username"`
+	PasswordHash string    `json:"password_hash"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
