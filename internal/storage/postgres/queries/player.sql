@@ -21,3 +21,15 @@ SET
     mana = $5,
     updated_at = CURRENT_TIMESTAMP
 WHERE id = $1;
+
+-- name: GetPlayerByUserId :one
+SELECT * FROM players WHERE user_id = $1 LIMIT 1;
+
+-- name: GetPlayerByID :one
+SELECT * FROM players WHERE id = $1;
+
+-- name: GetPlayersByUserId :many
+SELECT * FROM players WHERE user_id = $1;
+
+-- name: GetAllPlayers :many
+SELECT * FROM players;
