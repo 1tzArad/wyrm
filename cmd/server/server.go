@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/1tzArad/wyrm/internal/auth"
+	"github.com/1tzArad/wyrm/internal/config"
 	"github.com/1tzArad/wyrm/internal/game"
 	"github.com/1tzArad/wyrm/internal/game/handlers"
 	"github.com/1tzArad/wyrm/internal/network"
@@ -51,8 +52,9 @@ func init() {
 }
 
 func main() {
+	cfg := config.Setup()
 
-	dbcfg := storage.CreateConfig("postgres", "")
+	dbcfg := storage.CreateConfig("postgres", cfg.PostgresDB.ConnectionString())
 	db, err := storage.Open(*dbcfg)
 	if err != nil {
 		log.Fatal("Failed to open database connection!", "err", err.Error())

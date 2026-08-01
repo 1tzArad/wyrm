@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/charmbracelet/log"
@@ -12,28 +13,51 @@ type Config struct {
 }
 
 type PostgresConfig struct {
-	User string
-	Pass string
-	Host string
-	Port int
-	Name string
+	User    string
+	Pass    string
+	Host    string
+	Port    int
+	Name    string
+	SSLMode string
 }
 
 func Setup() *Config {
-	postgres_db_port_str := GetEnv("POSTGRES_PORT")
-	postgres_db_port, err := strconv.Atoi(postgres_db_port_str)
+	postgresDBPortStr := GetEnv("POSTGRES_PORT")
+	postgresDBPort, err := strconv.Atoi(postgresDBPortStr)
 	if err != nil {
 		log.Fatal("POSTGRES_PORT must be a number!")
 		return nil
 	}
+
+	postgresSSLMode := GetEnv("POSTGRES_SSL_MODE")
+
+	switch postgresSSLMode {
+	case "disable", "allow", "prefer", "require", "verify-ca", "verify-full":
+	default:
+		log.Fatalf("invalid POSTGRES_SSL_MODE: %q", postgresSSLMode)
+	}
+
 	return &Config{
 		JWTSecret: GetEnv("JWT_SECRET"),
 		PostgresDB: &PostgresConfig{
-			User: GetEnv("POSTGRES_USER"),
-			Pass: GetEnv("POSTGRES_PASS"),
-			Host: GetEnv("POSTGRES_HOST"),
-			Port: postgres_db_port,
-			Name: GetEnv("POSTGRES_NAME"),
+			User:    GetEnv("POSTGRES_USER"),
+			Pass:    GetEnv("POSTGRES_PASS"),
+			Host:    GetEnv("POSTGRES_HOST"),
+			Port:    postgresDBPort,
+			Name:    GetEnv("POSTGRES_NAME"),
+			SSLMode: postgresSSLMode,
 		},
 	}
+}
+
+func (cfg *PostgresConfig) ConnectionString() string {
+	return fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		cfg.Host,
+		cfg.Port,
+		cfg.User,
+		cfg.Pass,
+		cfg.Name,
+		cfg.SSLMode,
+	)
 }
