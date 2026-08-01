@@ -96,6 +96,11 @@ func main() {
 
 	r.GET("/ws", WSHandler(hub, world, registery))
 
+	user_repo := postgres_repository.NewUserRepository(db)
+	auth_service := auth.NewService(user_repo)
+	r.POST("/register", auth.RegisterHandler(auth_service))
+	r.POST("/login", auth.LoginHandler(auth_service))
+
 	// graceful shutdown
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
