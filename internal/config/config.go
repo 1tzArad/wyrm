@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/charmbracelet/log"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -22,8 +23,10 @@ type PostgresConfig struct {
 }
 
 func Setup() *Config {
+	setupDotEnv()
 	postgresDBPortStr := GetEnv("POSTGRES_PORT")
 	postgresDBPort, err := strconv.Atoi(postgresDBPortStr)
+	log.Info(postgresDBPortStr)
 	if err != nil {
 		log.Fatal("POSTGRES_PORT must be a number!")
 		return nil
@@ -60,4 +63,8 @@ func (cfg *PostgresConfig) ConnectionString() string {
 		cfg.Name,
 		cfg.SSLMode,
 	)
+}
+
+func setupDotEnv() {
+	godotenv.Load()
 }
