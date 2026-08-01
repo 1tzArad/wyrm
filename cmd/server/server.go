@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/1tzArad/wyrm/internal/auth"
 	"github.com/1tzArad/wyrm/internal/game"
 	"github.com/1tzArad/wyrm/internal/game/handlers"
 	"github.com/1tzArad/wyrm/internal/network"
@@ -109,6 +110,14 @@ func main() {
 
 func WSHandler(hub *network.Hub, world *game.World, registery *network.Registery) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// validate provided token
+		tokenString := c.Query("token")
+		user_id, err := auth.ValidateJWT(tokenString)
+		if err != nil {
+			response.Fail(c, http.StatusUnauthorized, "INVALID_TOKEN", "invalid or expired token!")
+			return
+		}
+
 		conn, err := wsUpgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
 			log.Error("Failed to upgrade connection!", "err", err.Error())
@@ -116,10 +125,15 @@ func WSHandler(hub *network.Hub, world *game.World, registery *network.Registery
 			return
 		}
 
-		playerUUID := uuid.New()
-		world.CreatePlayer(playerUUID)
+		player, err := world.LoadOrCreatePlayerForUser(c.Request.Context(), user_id)
 
-		client := network.NewClient(conn, hub, playerUUID, registery)
+		if err != nil {
+			log.Error("failed to load/create player", "err", err)
+			response.InternalFail(c)
+			return
+		}
+
+		client := network.NewClient(conn, hub, player.ID, registery)
 
 		hub.Register(client)
 
