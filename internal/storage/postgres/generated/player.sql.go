@@ -13,16 +13,26 @@ import (
 
 const createPlayer = `-- name: CreatePlayer :one
 INSERT INTO players (
-    user_id
+    user_id,
+    created_at,
+    updated_at
 )
 VALUES (
-    $1
+    $1,
+    $2,
+    $3
 )
 RETURNING id, user_id, x, y, hp, mana, created_at, updated_at
 `
 
-func (q *Queries) CreatePlayer(ctx context.Context, userID uuid.UUID) (Player, error) {
-	row := q.db.QueryRowContext(ctx, createPlayer, userID)
+type CreatePlayerParams struct {
+	UserID    uuid.UUID `json:"user_id"`
+	CreatedAt int64     `json:"created_at"`
+	UpdatedAt int64     `json:"updated_at"`
+}
+
+func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error) {
+	row := q.db.QueryRowContext(ctx, createPlayer, arg.UserID, arg.CreatedAt, arg.UpdatedAt)
 	var i Player
 	err := row.Scan(
 		&i.ID,
@@ -176,16 +186,17 @@ SET
     y = $3,
     hp = $4,
     mana = $5,
-    updated_at = CURRENT_TIMESTAMP
+    updated_at = $6
 WHERE id = $1
 `
 
 type SavePlayerParams struct {
-	ID   uuid.UUID `json:"id"`
-	X    int32     `json:"x"`
-	Y    int32     `json:"y"`
-	Hp   int32     `json:"hp"`
-	Mana int32     `json:"mana"`
+	ID        uuid.UUID `json:"id"`
+	X         int32     `json:"x"`
+	Y         int32     `json:"y"`
+	Hp        int32     `json:"hp"`
+	Mana      int32     `json:"mana"`
+	UpdatedAt int64     `json:"updated_at"`
 }
 
 func (q *Queries) SavePlayer(ctx context.Context, arg SavePlayerParams) error {
@@ -195,6 +206,7 @@ func (q *Queries) SavePlayer(ctx context.Context, arg SavePlayerParams) error {
 		arg.Y,
 		arg.Hp,
 		arg.Mana,
+		arg.UpdatedAt,
 	)
 	return err
 }

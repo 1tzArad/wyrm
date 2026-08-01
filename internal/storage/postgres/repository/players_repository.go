@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/1tzArad/wyrm/internal/player"
 	sqlc "github.com/1tzArad/wyrm/internal/storage/postgres/generated"
@@ -25,7 +26,11 @@ func NewPlayerRepository(db *sql.DB) *PlayerRepository {
 }
 
 func (r *PlayerRepository) Create(ctx context.Context, user_uuid uuid.UUID) (*player.Player, error) {
-	row, err := r.queries.CreatePlayer(ctx, user_uuid)
+	row, err := r.queries.CreatePlayer(ctx, sqlc.CreatePlayerParams{
+		UserID:    user_uuid,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -98,10 +103,11 @@ func (r *PlayerRepository) LoadPlayer(ctx context.Context, id uuid.UUID) (*playe
 
 func (r *PlayerRepository) SavePlayer(ctx context.Context, p *player.Player) error {
 	return r.queries.SavePlayer(ctx, sqlc.SavePlayerParams{
-		ID:   p.ID,
-		X:    p.X,
-		Y:    p.Y,
-		Hp:   p.Health,
-		Mana: p.Mana,
+		ID:        p.ID,
+		X:         p.X,
+		Y:         p.Y,
+		Hp:        p.Health,
+		Mana:      p.Mana,
+		UpdatedAt: time.Now().Unix(),
 	})
 }

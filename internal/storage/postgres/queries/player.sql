@@ -3,10 +3,14 @@ SELECT * FROM players WHERE id = $1;
 
 -- name: CreatePlayer :one
 INSERT INTO players (
-    user_id
+    user_id,
+    created_at,
+    updated_at
 )
 VALUES (
-    $1
+    $1,
+    $2,
+    $3
 )
 RETURNING *;
 
@@ -17,7 +21,7 @@ SET
     y = $3,
     hp = $4,
     mana = $5,
-    updated_at = CURRENT_TIMESTAMP
+    updated_at = $6
 WHERE id = $1;
 
 -- name: GetPlayerByUserId :one

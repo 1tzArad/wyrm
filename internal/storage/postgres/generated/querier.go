@@ -11,7 +11,7 @@ import (
 )
 
 type Querier interface {
-	CreatePlayer(ctx context.Context, userID uuid.UUID) (Player, error)
+	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetAllPlayers(ctx context.Context) ([]Player, error)
 	GetAllUsers(ctx context.Context) ([]User, error)

@@ -4,7 +4,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    created_at BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT
+    created_at BIGINT NOT NULL
 );
 
 CREATE TABLE players (
@@ -17,6 +17,6 @@ CREATE TABLE players (
     hp INTEGER NOT NULL DEFAULT 100,
     mana INTEGER NOT NULL DEFAULT 100,
 
-    created_at BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
-    updated_at BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT
+    created_at BIGINT NOT NULL,
+    updated_at BIGINT NOT NULL
 );

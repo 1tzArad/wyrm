@@ -10,11 +10,13 @@ SELECT * FROM users;
 -- name: CreateUser :one
 INSERT INTO users ( 
     username, 
-    password_hash 
+    password_hash,
+    created_at
 ) 
 VALUES (
     $1,
-    $2
+    $2,
+    $3
 )
 RETURNING *;
 
