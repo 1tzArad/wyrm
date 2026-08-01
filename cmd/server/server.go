@@ -129,6 +129,7 @@ func WSHandler(hub *network.Hub, world *game.World, registery *network.Registery
 
 		if err != nil {
 			log.Error("failed to load/create player", "err", err)
+			conn.Close()
 			response.InternalFail(c)
 			return
 		}
