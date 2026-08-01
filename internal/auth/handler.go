@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/1tzArad/wyrm/pkg/response"
+	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +21,7 @@ func RegisterHandler(service *Service) gin.HandlerFunc {
 				response.Fail(c, http.StatusConflict, "USERNAME_EXISTS", "username already taken")
 				return
 			}
+			log.Error("there is an error in register handler!", "err", err)
 			response.InternalFail(c)
 			return
 		}

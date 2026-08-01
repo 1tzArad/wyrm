@@ -3,12 +3,10 @@ SELECT * FROM players WHERE id = $1;
 
 -- name: CreatePlayer :one
 INSERT INTO players (
-    id,
     user_id
 )
 VALUES (
-    $1,
-    $2
+    $1
 )
 RETURNING *;
 

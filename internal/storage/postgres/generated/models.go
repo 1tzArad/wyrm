@@ -5,8 +5,6 @@
 package sqlc
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 )
 
@@ -17,13 +15,13 @@ type Player struct {
 	Y         int32     `json:"y"`
 	Hp        int32     `json:"hp"`
 	Mana      int32     `json:"mana"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt int64     `json:"created_at"`
+	UpdatedAt int64     `json:"updated_at"`
 }
 
 type User struct {
 	ID           uuid.UUID `json:"id"`
 	Username     string    `json:"username"`
 	PasswordHash string    `json:"password_hash"`
-	CreatedAt    time.Time `json:"created_at"`
+	CreatedAt    int64     `json:"created_at"`
 }

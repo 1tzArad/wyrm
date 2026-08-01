@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/1tzArad/wyrm/internal/player"
-	sqlc "github.com/1tzArad/wyrm/internal/storage/postgres/generated"
 	"github.com/google/uuid"
 )
 
@@ -13,5 +12,5 @@ type PlayerStore interface {
 	LoadPlayer(ctx context.Context, id uuid.UUID) (*player.Player, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*player.Player, error)
 	GetByUserID(ctx context.Context, userID uuid.UUID) (*player.Player, error)
-	Create(ctx context.Context, arg sqlc.CreatePlayerParams) (*player.Player, error)
+	Create(ctx context.Context, user_uud uuid.UUID) (*player.Player, error)
 }

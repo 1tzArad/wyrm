@@ -6,7 +6,6 @@ import (
 
 	"github.com/1tzArad/wyrm/internal/network"
 	"github.com/1tzArad/wyrm/internal/player"
-	sqlc "github.com/1tzArad/wyrm/internal/storage/postgres/generated"
 	"github.com/charmbracelet/log"
 	"github.com/google/uuid"
 )
@@ -106,9 +105,7 @@ func (w *World) LoadOrCreatePlayerForUser(ctx context.Context, userID uuid.UUID)
 		return existingPlayer, nil
 	}
 
-	newPlayer, err := w.store.Create(ctx, sqlc.CreatePlayerParams{
-		UserID: userID,
-	})
+	newPlayer, err := w.store.Create(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

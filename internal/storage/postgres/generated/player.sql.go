@@ -13,23 +13,16 @@ import (
 
 const createPlayer = `-- name: CreatePlayer :one
 INSERT INTO players (
-    id,
     user_id
 )
 VALUES (
-    $1,
-    $2
+    $1
 )
 RETURNING id, user_id, x, y, hp, mana, created_at, updated_at
 `
 
-type CreatePlayerParams struct {
-	ID     uuid.UUID `json:"id"`
-	UserID uuid.UUID `json:"user_id"`
-}
-
-func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error) {
-	row := q.db.QueryRowContext(ctx, createPlayer, arg.ID, arg.UserID)
+func (q *Queries) CreatePlayer(ctx context.Context, userID uuid.UUID) (Player, error) {
+	row := q.db.QueryRowContext(ctx, createPlayer, userID)
 	var i Player
 	err := row.Scan(
 		&i.ID,

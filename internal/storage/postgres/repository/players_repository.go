@@ -24,8 +24,8 @@ func NewPlayerRepository(db *sql.DB) *PlayerRepository {
 	}
 }
 
-func (r *PlayerRepository) Create(ctx context.Context, arg sqlc.CreatePlayerParams) (*player.Player, error) {
-	row, err := r.queries.CreatePlayer(ctx, arg)
+func (r *PlayerRepository) Create(ctx context.Context, user_uuid uuid.UUID) (*player.Player, error) {
+	row, err := r.queries.CreatePlayer(ctx, user_uuid)
 	if err != nil {
 		return nil, err
 	}
