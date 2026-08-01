@@ -1,10 +1,12 @@
 package game
 
 import (
+	"context"
 	"sync"
 
 	"github.com/1tzArad/wyrm/internal/network"
 	"github.com/1tzArad/wyrm/internal/player"
+	sqlc "github.com/1tzArad/wyrm/internal/storage/postgres/generated"
 	"github.com/charmbracelet/log"
 	"github.com/google/uuid"
 )
@@ -95,4 +97,22 @@ func (w *World) Snapshot() []PlayerState {
 		})
 	}
 	return states
+}
+
+func (w *World) LoadOrCreatePlayerForUser(ctx context.Context, userID uuid.UUID) (*player.Player, error) {
+	existingPlayer, err := w.store.GetByUserID(ctx, userID)
+	if err == nil {
+		w.players[existingPlayer.ID] = existingPlayer
+		return existingPlayer, nil
+	}
+
+	newPlayer, err := w.store.Create(ctx, sqlc.CreatePlayerParams{
+		UserID: userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	w.players[newPlayer.ID] = newPlayer
+	return newPlayer, nil
 }
