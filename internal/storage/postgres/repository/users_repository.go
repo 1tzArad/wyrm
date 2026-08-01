@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	sqlc "github.com/1tzArad/wyrm/internal/storage/postgres/generated"
 	"github.com/google/uuid"
@@ -24,6 +25,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 }
 
 func (r *UserRepository) Create(ctx context.Context, arg sqlc.CreateUserParams) (sqlc.User, error) {
+	arg.CreatedAt = time.Now().Unix()
 	return r.queries.CreateUser(ctx, arg)
 }
 
