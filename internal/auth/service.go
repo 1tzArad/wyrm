@@ -13,7 +13,7 @@ var ErrInvalidCredentials = errors.New("invalid username or password")
 var ErrUserExists = errors.New("username already exists")
 
 type UserRepository interface {
-	GetByUsername(ctx context.Context, username string) (sqlc.User, error)
+	GetByUsername(ctx context.Context, username string) (sqlc.User, bool, error)
 	Create(ctx context.Context, arg sqlc.CreateUserParams) (sqlc.User, error)
 }
 
@@ -26,10 +26,14 @@ func NewService(userRepo UserRepository) *Service {
 }
 
 func (s *Service) Register(ctx context.Context, username, password string) error {
-	_, err := s.userRepo.GetByUsername(ctx, username)
+	_, found, err := s.userRepo.GetByUsername(ctx, username)
 	if err != nil {
+		return err
+	}
+	if found {
 		return ErrUserExists
 	}
+
 	hashedPassword, err := hashPassword(password)
 	if err != nil {
 		return err
@@ -40,8 +44,8 @@ func (s *Service) Register(ctx context.Context, username, password string) error
 }
 
 func (s *Service) Login(ctx context.Context, username, password string) (string, error) {
-	user, err := s.userRepo.GetByUsername(ctx, username)
-	if err != nil {
+	user, found, err := s.userRepo.GetByUsername(ctx, username)
+	if err != nil || !found {
 		return "", ErrInvalidCredentials
 	}
 

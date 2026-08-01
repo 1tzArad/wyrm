@@ -38,15 +38,15 @@ func (r *UserRepository) GetByID(ctx context.Context, id uuid.UUID) (sqlc.User, 
 	return user, nil
 }
 
-func (r *UserRepository) GetByUsername(ctx context.Context, username string) (sqlc.User, error) {
+func (r *UserRepository) GetByUsername(ctx context.Context, username string) (sqlc.User, bool, error) {
 	user, err := r.queries.GetUserByUsername(ctx, username)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return sqlc.User{}, ErrUserNotFound
-		}
-		return sqlc.User{}, err
+	if errors.Is(err, sql.ErrNoRows) {
+		return sqlc.User{}, false, nil
 	}
-	return user, nil
+	if err != nil {
+		return sqlc.User{}, false, err
+	}
+	return user, true, nil
 }
 
 func (r *UserRepository) GetAll(ctx context.Context) ([]sqlc.User, error) {
