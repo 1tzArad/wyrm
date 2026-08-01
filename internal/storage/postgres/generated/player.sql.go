@@ -24,8 +24,8 @@ RETURNING id, user_id, x, y, hp, mana, created_at, updated_at
 `
 
 type CreatePlayerParams struct {
-	ID     uuid.UUID     `json:"id"`
-	UserID uuid.NullUUID `json:"user_id"`
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
 }
 
 func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error) {
@@ -124,7 +124,7 @@ const getPlayerByUserId = `-- name: GetPlayerByUserId :one
 SELECT id, user_id, x, y, hp, mana, created_at, updated_at FROM players WHERE user_id = $1 LIMIT 1
 `
 
-func (q *Queries) GetPlayerByUserId(ctx context.Context, userID uuid.NullUUID) (Player, error) {
+func (q *Queries) GetPlayerByUserId(ctx context.Context, userID uuid.UUID) (Player, error) {
 	row := q.db.QueryRowContext(ctx, getPlayerByUserId, userID)
 	var i Player
 	err := row.Scan(
@@ -144,7 +144,7 @@ const getPlayersByUserId = `-- name: GetPlayersByUserId :many
 SELECT id, user_id, x, y, hp, mana, created_at, updated_at FROM players WHERE user_id = $1
 `
 
-func (q *Queries) GetPlayersByUserId(ctx context.Context, userID uuid.NullUUID) ([]Player, error) {
+func (q *Queries) GetPlayersByUserId(ctx context.Context, userID uuid.UUID) ([]Player, error) {
 	rows, err := q.db.QueryContext(ctx, getPlayersByUserId, userID)
 	if err != nil {
 		return nil, err

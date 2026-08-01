@@ -11,14 +11,14 @@ import (
 )
 
 type Player struct {
-	ID        uuid.UUID     `json:"id"`
-	UserID    uuid.NullUUID `json:"user_id"`
-	X         int32         `json:"x"`
-	Y         int32         `json:"y"`
-	Hp        int32         `json:"hp"`
-	Mana      int32         `json:"mana"`
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
+	X         int32     `json:"x"`
+	Y         int32     `json:"y"`
+	Hp        int32     `json:"hp"`
+	Mana      int32     `json:"mana"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type User struct {

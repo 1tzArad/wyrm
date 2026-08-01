@@ -17,8 +17,8 @@ type Querier interface {
 	GetAllUsers(ctx context.Context) ([]User, error)
 	GetPlayer(ctx context.Context, id uuid.UUID) (Player, error)
 	GetPlayerByID(ctx context.Context, id uuid.UUID) (Player, error)
-	GetPlayerByUserId(ctx context.Context, userID uuid.NullUUID) (Player, error)
-	GetPlayersByUserId(ctx context.Context, userID uuid.NullUUID) ([]Player, error)
+	GetPlayerByUserId(ctx context.Context, userID uuid.UUID) (Player, error)
+	GetPlayersByUserId(ctx context.Context, userID uuid.UUID) ([]Player, error)
 	GetUserById(ctx context.Context, id uuid.UUID) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	SavePlayer(ctx context.Context, arg SavePlayerParams) error

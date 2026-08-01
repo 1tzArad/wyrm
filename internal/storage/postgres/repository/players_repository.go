@@ -24,38 +24,68 @@ func NewPlayerRepository(db *sql.DB) *PlayerRepository {
 	}
 }
 
-func (r *PlayerRepository) Create(ctx context.Context, arg sqlc.CreatePlayerParams) (sqlc.Player, error) {
-	return r.queries.CreatePlayer(ctx, arg)
+func (r *PlayerRepository) Create(ctx context.Context, arg sqlc.CreatePlayerParams) (*player.Player, error) {
+	row, err := r.queries.CreatePlayer(ctx, arg)
+	if err != nil {
+		return nil, err
+	}
+	return toPlayer(row), nil
 }
 
-func (r *PlayerRepository) GetByID(ctx context.Context, id uuid.UUID) (sqlc.Player, error) {
+func (r *PlayerRepository) GetByID(ctx context.Context, id uuid.UUID) (*player.Player, error) {
 	row, err := r.queries.GetPlayerByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return sqlc.Player{}, ErrPlayerNotFound
+			return nil, ErrPlayerNotFound
 		}
-		return sqlc.Player{}, err
+		return nil, err
 	}
-	return row, nil
+	return toPlayer(row), nil
 }
 
-func (r *PlayerRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (sqlc.Player, error) {
-	row, err := r.queries.GetPlayerByUserId(ctx, uuid.NullUUID{UUID: userID, Valid: true})
+func (r *PlayerRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (*player.Player, error) {
+	row, err := r.queries.GetPlayerByUserId(ctx, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return sqlc.Player{}, ErrPlayerNotFound
+			return nil, ErrPlayerNotFound
 		}
-		return sqlc.Player{}, err
+		return nil, err
 	}
-	return row, nil
+	return toPlayer(row), nil
 }
 
-func (r *PlayerRepository) GetPlayersByUserID(ctx context.Context, userID uuid.UUID) ([]sqlc.Player, error) {
-	return r.queries.GetPlayersByUserId(ctx, uuid.NullUUID{UUID: userID, Valid: true})
+func (r *PlayerRepository) GetPlayersByUserID(ctx context.Context, userID uuid.UUID) ([]*player.Player, error) {
+	rows, err := r.queries.GetPlayersByUserId(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	players := make([]*player.Player, 0, len(rows))
+	for _, row := range rows {
+		players = append(players, toPlayer(row))
+	}
+	return players, nil
 }
 
-func (r *PlayerRepository) GetAll(ctx context.Context) ([]sqlc.Player, error) {
-	return r.queries.GetAllPlayers(ctx)
+func (r *PlayerRepository) GetAll(ctx context.Context) ([]*player.Player, error) {
+	rows, err := r.queries.GetAllPlayers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	players := make([]*player.Player, 0, len(rows))
+	for _, row := range rows {
+		players = append(players, toPlayer(row))
+	}
+	return players, nil
+}
+
+func toPlayer(row sqlc.Player) *player.Player {
+	return &player.Player{
+		ID:     row.ID,
+		X:      row.X,
+		Y:      row.Y,
+		Health: row.Hp,
+		Mana:   row.Mana,
+	}
 }
 
 func (r *PlayerRepository) LoadPlayer(ctx context.Context, id uuid.UUID) (*player.Player, error) {
@@ -63,14 +93,7 @@ func (r *PlayerRepository) LoadPlayer(ctx context.Context, id uuid.UUID) (*playe
 	if err != nil {
 		return nil, err
 	}
-
-	return &player.Player{
-		ID:     row.ID,
-		X:      row.X,
-		Y:      row.Y,
-		Health: row.Hp,
-		Mana:   row.Mana,
-	}, nil
+	return toPlayer(row), nil
 }
 
 func (r *PlayerRepository) SavePlayer(ctx context.Context, p *player.Player) error {
