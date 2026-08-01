@@ -44,6 +44,42 @@ func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Pla
 	return i, err
 }
 
+const getAllPlayers = `-- name: GetAllPlayers :many
+SELECT id, user_id, x, y, hp, mana, created_at, updated_at FROM players
+`
+
+func (q *Queries) GetAllPlayers(ctx context.Context) ([]Player, error) {
+	rows, err := q.db.QueryContext(ctx, getAllPlayers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Player
+	for rows.Next() {
+		var i Player
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.X,
+			&i.Y,
+			&i.Hp,
+			&i.Mana,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPlayer = `-- name: GetPlayer :one
 SELECT id, user_id, x, y, hp, mana, created_at, updated_at FROM players WHERE id = $1
 `
@@ -62,6 +98,82 @@ func (q *Queries) GetPlayer(ctx context.Context, id uuid.UUID) (Player, error) {
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getPlayerByID = `-- name: GetPlayerByID :one
+SELECT id, user_id, x, y, hp, mana, created_at, updated_at FROM players WHERE id = $1
+`
+
+func (q *Queries) GetPlayerByID(ctx context.Context, id uuid.UUID) (Player, error) {
+	row := q.db.QueryRowContext(ctx, getPlayerByID, id)
+	var i Player
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.X,
+		&i.Y,
+		&i.Hp,
+		&i.Mana,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getPlayerByUserId = `-- name: GetPlayerByUserId :one
+SELECT id, user_id, x, y, hp, mana, created_at, updated_at FROM players WHERE user_id = $1 LIMIT 1
+`
+
+func (q *Queries) GetPlayerByUserId(ctx context.Context, userID uuid.NullUUID) (Player, error) {
+	row := q.db.QueryRowContext(ctx, getPlayerByUserId, userID)
+	var i Player
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.X,
+		&i.Y,
+		&i.Hp,
+		&i.Mana,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getPlayersByUserId = `-- name: GetPlayersByUserId :many
+SELECT id, user_id, x, y, hp, mana, created_at, updated_at FROM players WHERE user_id = $1
+`
+
+func (q *Queries) GetPlayersByUserId(ctx context.Context, userID uuid.NullUUID) ([]Player, error) {
+	rows, err := q.db.QueryContext(ctx, getPlayersByUserId, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Player
+	for rows.Next() {
+		var i Player
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.X,
+			&i.Y,
+			&i.Hp,
+			&i.Mana,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const savePlayer = `-- name: SavePlayer :exec

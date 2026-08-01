@@ -13,8 +13,12 @@ import (
 type Querier interface {
 	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetAllPlayers(ctx context.Context) ([]Player, error)
 	GetAllUsers(ctx context.Context) ([]User, error)
 	GetPlayer(ctx context.Context, id uuid.UUID) (Player, error)
+	GetPlayerByID(ctx context.Context, id uuid.UUID) (Player, error)
+	GetPlayerByUserId(ctx context.Context, userID uuid.NullUUID) (Player, error)
+	GetPlayersByUserId(ctx context.Context, userID uuid.NullUUID) ([]Player, error)
 	GetUserById(ctx context.Context, id uuid.UUID) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	SavePlayer(ctx context.Context, arg SavePlayerParams) error
