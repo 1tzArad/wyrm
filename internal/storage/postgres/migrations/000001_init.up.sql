@@ -7,8 +7,8 @@ CREATE TABLE users (
 
 CREATE TABLE players (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id),
-
+    user_id UUID NOT NULL REFERENCES users(id),
+    
     x INTEGER NOT NULL DEFAULT 0,
     y INTEGER NOT NULL DEFAULT 0,
 
